@@ -87,6 +87,7 @@ function isInPeriod(date: Date, periodStart: Date, periodEnd: Date): boolean {
  * Parses a bank-supplied date string into a Date object.
  */
 function parseBankDate(isoString: string): Date {
+  // TODO(requirement): Ensure timezone-aware parsing/normalization for bank dates before period checks.
   return new Date(isoString)
 }
 
@@ -122,6 +123,7 @@ export async function reconcilePayments(
   periodStart: Date,
   periodEnd: Date,
 ): Promise<ReconciliationResult> {
+  // TODO(requirement): Add concurrency-safe reconciliation guards for same-period parallel requests.
   const systemPayments = (await db
     .select()
     .from(payments)
@@ -160,6 +162,8 @@ export async function reconcilePayments(
     }
   }
 
+  // TODO(requirement): Persist discrepancy details for reviewer workflow (not only aggregate counts).
+
   const totalBankAmountCents = inPeriodBankData.reduce((sum, r) => sum + toCents(r.amount), 0)
   const totalSystemAmountCents = systemPayments.reduce(
     (sum: number, p: Payment) => sum + toCents(p.amount),
@@ -190,6 +194,7 @@ export async function reconcilePayments(
     id: saved.id,
     matched,
     unmatched: { bankOnly, systemOnly },
+    // TODO(requirement): Ensure discrepancy data is surfaced in dashboard review UI and historical run details.
     discrepancies,
     summary: { totalBankAmount, totalSystemAmount, difference },
   }

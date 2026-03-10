@@ -39,6 +39,8 @@ export async function POST(req: NextRequest) {
       new Date(parsed.periodEnd),
     )
 
+    // TODO(requirement): Provide dedicated discrepancy review payload/endpoint for finance team workflow.
+
     return NextResponse.json({ runId, ...result }, { status: 200 })
   } catch (error: any) {
     return NextResponse.json({ error: error.stack }, { status: 500 })
@@ -73,6 +75,7 @@ export async function GET(req: NextRequest) {
       unmatchedCount: row.unmatched_count,
       difference: Number(row.difference ?? 0),
       status: row.status,
+      // TODO(requirement): Load persisted bank-only/system-only/discrepancy detail snapshots for each run.
       bankOnly: [],
       systemOnly: [],
     }))

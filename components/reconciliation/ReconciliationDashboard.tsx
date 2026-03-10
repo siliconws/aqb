@@ -102,6 +102,8 @@ export function ReconciliationDashboard() {
                 const systemOnlyCount = run.systemOnly?.length ?? 0
                 const isExpanded = expandedRunIds.has(run.id)
 
+                // TODO(requirement): Add discrepancy review section per run once discrepancy details are returned by API.
+
                 return (
                   <Fragment key={run.id}>
                     <TableRow key={run.id}>
