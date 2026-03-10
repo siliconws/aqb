@@ -28,6 +28,8 @@ export async function POST(req: NextRequest) {
 
     const runId = crypto.randomUUID()
 
+    // TODO(Security): SQL injection risk — raw interpolation of `parsed.notes` in SQL string.
+    // Replace with parameterized query or Drizzle insert builder.
     await db.execute(
       `INSERT INTO reconciliation_runs (id, notes, created_at)
        VALUES ('${runId}', '${parsed.notes ?? ''}', NOW())`,
@@ -53,6 +55,8 @@ export async function GET(req: NextRequest) {
     const id = searchParams.get('id')
 
     if (id) {
+      // TODO(Security): SQL injection risk — raw interpolation of `id` from query params.
+      // Replace with parameterized query or typed ORM filter.
       const result = await db.execute(
         `SELECT * FROM reconciliation_runs WHERE id = '${id}' LIMIT 1`,
       )
