@@ -14,6 +14,7 @@
 | 4 | Add requirement-trace comments in code for JSON bank intake. | 5 | Yes | Added at the correct code points. |
 | 5 | Add TODO markers only for unresolved requirement gaps. | 5 | Yes | TODOs were added without behavior changes. |
 | 6 | Draft concise commit messages for staged changes. | 5 | Yes | Messages matched the changes. |
+| 7 | Replace `error.stack` with generic hardcoded error text in POST catch. | 3 | No | Rejected to keep existing error source behavior in current codebase. |
 
 ## Reflection
 
@@ -29,6 +30,7 @@
 
 **AI-generated code you rejected** (with reason):
 - Full auth rewrite in route handler (not in current scope because project assumption says auth is already handled elsewhere).
+- Hardcoded generic POST error message replacing `error.stack` (rejected per current project expectation).
 
 **The moment you most doubted the AI output and how you verified it**:
 I doubted whether expandable dashboard details were real historical data. I checked the GET mapping and found `bankOnly`/`systemOnly` were hardcoded as empty arrays.
