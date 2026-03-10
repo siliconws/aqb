@@ -44,7 +44,8 @@ export function ReconciliationDashboard() {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch('/api/v1/reconcile')
+        // TODO(requirement): Implement real-time updates via WebSocket or Server-Sent Events instead of polling.
+        const res = await fetch('/api/v1/reconcile') 
         const data = await res.json()
         setRuns(data.runs ?? [])
       } catch {
