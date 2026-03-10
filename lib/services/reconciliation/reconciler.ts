@@ -117,14 +117,15 @@ async function markReconciled(paymentId: string): Promise<void> {
 // ─── Main export ─────────────────────────────────────────────────────────────
 
 export async function reconcilePayments(
+  // Requirement trace: batch of bank records (JSON converted from CSV import).
   bankData: BankRecord[],
   periodStart: Date,
   periodEnd: Date,
 ): Promise<ReconciliationResult> {
-  const systemPayments = await db
+  const systemPayments = (await db
     .select()
     .from(payments)
-    .where(between(payments.createdAt, periodStart, periodEnd))
+    .where(between(payments.createdAt, periodStart, periodEnd))) as Payment[]
 
   const matched: MatchedPair[] = []
   const discrepancies: Discrepancy[] = []
@@ -136,7 +137,7 @@ export async function reconcilePayments(
   })
 
   for (const bankRecord of inPeriodBankData) {
-    const remaining = systemPayments.filter(p => !matchedPaymentIds.has(p.id))
+    const remaining = systemPayments.filter((p: Payment) => !matchedPaymentIds.has(p.id))
     const match = findMatch(bankRecord, remaining)
 
     if (match) {
@@ -147,7 +148,9 @@ export async function reconcilePayments(
       continue
     }
 
-    const refCandidate = remaining.find(p => refsMatch(bankRecord, p) && p.currency === bankRecord.currency)
+    const refCandidate = remaining.find(
+      (p: Payment) => refsMatch(bankRecord, p) && p.currency === bankRecord.currency,
+    )
     if (refCandidate) {
       discrepancies.push({
         bankRecord,
@@ -158,13 +161,16 @@ export async function reconcilePayments(
   }
 
   const totalBankAmountCents = inPeriodBankData.reduce((sum, r) => sum + toCents(r.amount), 0)
-  const totalSystemAmountCents = systemPayments.reduce((sum, p) => sum + toCents(p.amount), 0)
+  const totalSystemAmountCents = systemPayments.reduce(
+    (sum: number, p: Payment) => sum + toCents(p.amount),
+    0,
+  )
   const totalBankAmount = totalBankAmountCents / 100
   const totalSystemAmount = totalSystemAmountCents / 100
   const difference = calculateDelta(totalBankAmount, totalSystemAmount)
 
   const bankOnly = inPeriodBankData.filter(r => !matchedBankIds.has(r.transactionId))
-  const systemOnly = systemPayments.filter(p => !matchedPaymentIds.has(p.id))
+  const systemOnly = systemPayments.filter((p: Payment) => !matchedPaymentIds.has(p.id))
 
   const [saved] = await db
     .insert(reconciliations)

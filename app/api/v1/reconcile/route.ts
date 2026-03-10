@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { reconcilePayments, BankRecord } from '@/lib/services/reconciliation/reconciler'
 
 const ReconcileRequestSchema = z.object({
+  // Requirement trace: accepts a batch of bank records uploaded as JSON (CSV-import representation).
   bankData: z.array(
     z.object({
       transactionId: z.string(),
@@ -21,6 +22,7 @@ const ReconcileRequestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    // Intake point for uploaded bank statement payload in JSON format.
     const body = await req.json()
     const parsed = ReconcileRequestSchema.parse(body)
 
